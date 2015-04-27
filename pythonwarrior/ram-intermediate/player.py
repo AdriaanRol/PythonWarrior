@@ -18,9 +18,10 @@ class Player(object):
         self.surroundings = self.sense_surroundings()
 
         # Move if current surroundings are clear
-        sounds = warrior.listen()
+        self.sounds = warrior.listen()
+        print 'Ram hears sounds the sounds coming from: %s' % self.sounds
 
-        print 'Ram hears sounds in the following directions %s' % sounds
+
 
         if self.check_rest_needed() & self.check_safe_to_rest():
             warrior.rest_()
@@ -37,8 +38,17 @@ class Player(object):
             self.free_captive()
             return
         else:
-            warrior.walk_(warrior.direction_of_stairs())
+            direction = self.determine_direction()
+            warrior.walk_(direction)
             return
+
+    def determine_direction(self):
+        for sound in self.sounds:
+            if sound.is_captive():
+                direction = self.warrior.direction_of(sound)
+                return direction
+        direction = self.warrior.direction_of_stairs()
+        return direction
 
     def bind_adjacent_enemy(self):
         for direction, place in self.surroundings.iteritems():
