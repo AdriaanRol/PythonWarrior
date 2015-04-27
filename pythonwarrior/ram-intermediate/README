@@ -1,0 +1,61 @@
+Level 3
+
+You feel slime on all sides, you're surrounded!
+
+Tip: Call warrior.bind_(direction) to bind an enemy to keep him from attacking. Bound enemies look like captives.
+
+ ---
+|>s |
+|s@s|
+| C |
+ ---
+
+
+  > = Stairs
+
+  @ = Ram (20 HP)
+
+  s = Sludge (12 HP)
+
+  C = Captive (1 HP)
+
+
+
+Warrior Abilities:
+
+
+  warrior.attack_
+    Attacks a unit in given direction (forward by default).
+
+
+  warrior.direction_of_stairs
+    Returns the direction ('left', 'right', 'forward','backward') the stairs are from your location
+
+
+  warrior.feel
+    Returns a Space for the given direction (forward by default)
+
+
+  warrior.rescue_
+    Rescue a captive from his chains (earning 20 points)in given direction (forward by default)
+
+
+  warrior.health
+    Returns an integer representing your health.
+
+
+  warrior.rest_
+    Gain 10% of max health back, but do nothing more.
+
+
+  warrior.walk_
+    Move in the given direction (forward by default).
+
+
+  warrior.bind_
+    Binds a unit in given direction to keep him from moving (forward by default).
+
+
+
+
+When you're done editing player.py, run `pythonwarrior` again.
