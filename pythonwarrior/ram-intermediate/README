@@ -1,23 +1,25 @@
-Level 3
+Level 4
 
-You feel slime on all sides, you're surrounded!
+Your ears become more in tune with the surroundings. Listen to find enemies and captives!
 
-Tip: Call warrior.bind_(direction) to bind an enemy to keep him from attacking. Bound enemies look like captives.
+Tip: Use warrior.listen to find spaces with other units, and warrior.direction_of to determine what direction they're in.
 
- ---
-|>s |
-|s@s|
-| C |
- ---
+ ----
+|C s |
+| @ S|
+|C s>|
+ ----
 
 
   > = Stairs
 
   @ = Ram (20 HP)
 
+  C = Captive (1 HP)
+
   s = Sludge (12 HP)
 
-  C = Captive (1 HP)
+  S = ThickSludge (24 HP)
 
 
 
@@ -44,6 +46,10 @@ Warrior Abilities:
     Returns an integer representing your health.
 
 
+  warrior.direction_of
+    Pass a Space as an argument, and the direction (:left, :right, :forward, :backward) to that space will be returned.
+
+
   warrior.rest_
     Gain 10% of max health back, but do nothing more.
 
@@ -54,6 +60,10 @@ Warrior Abilities:
 
   warrior.bind_
     Binds a unit in given direction to keep him from moving (forward by default).
+
+
+  warrior.listen
+    Returns an array of all spaces which have units in them.
 
 
 
