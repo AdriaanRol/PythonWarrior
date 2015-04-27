@@ -1,9 +1,12 @@
+import operator  # used for getting the max key of a dictionary
+
 class Player(object):
     def play_turn(self, warrior):
         '''
         Current strategy in determining what action to undertake
         1. Get information on surroundings
         2. Take care of personal safety.
+            # Bombs are super high priority
         3. Move towards objective.
            1. Free all prisoners
            2. Move to stairs
@@ -17,17 +20,28 @@ class Player(object):
 
         self.warrior = warrior
         self.surroundings = self.sense_surroundings()
-
-        # Move if current surroundings are clear
         self.sounds = warrior.listen()
+        direction = self.determine_direction_of_next_objective()
 
         if self.check_rest_needed() & self.check_safe_to_rest():
             warrior.rest_()
             return
+        elif self.check_ticking_near():
+            self.free_bomb_captive()
+            return
+
+        elif self.check_bomb_ticking():
+            if warrior.feel(direction).is_empty():
+                warrior.walk_(direction)
+            elif warrior.feel(direction).is_enemy():
+                warrior.attack_(direction)
+            return
+
         elif self.check_threatened():
             print 'Ram is feeling threatened, starting to bind enemies'
             self.bind_adjacent_enemy()
             return
+
         elif self.check_No_Enemies_near() >= 1:
             print 'Ram is confident he can slay this beast! Attacking!'
             self.attack_adjacent_enemy()
@@ -36,7 +50,7 @@ class Player(object):
             self.free_captive()
             return
         else:
-            direction = self.determine_direction_of_next_objective()
+
             if self.sounds != []:
                 direction = self.avoid_stairs(direction)
             warrior.walk_(direction)
@@ -61,19 +75,43 @@ class Player(object):
 
     def determine_direction_of_next_objective(self):
         '''
-        Goes over all sounds and sets direction to run towards first sound.
-        No smartness in here yet.
+        Goes over all sounds and sets direction to move to.
+
+        Goes over all sounds and adds priority to certain sounds.
+
         '''
+        priorities = {}
+        priorities['forward'] = 0
+        priorities['backward'] = 0
+        priorities['left'] = 0
+        priorities['right'] = 0
+
         for sound in self.sounds:
+            if sound.is_ticking():
+                direction = self.warrior.direction_of(sound)
+                priorities[direction] += 15
             if sound.is_captive():
                 direction = self.warrior.direction_of(sound)
-                return direction
-            elif sound.is_enemy():
+                priorities[direction] += 5
+            if sound.is_enemy():
                 direction = self.warrior.direction_of(sound)
-                return direction
+                priorities[direction] += 1
 
-        direction = self.warrior.direction_of_stairs()
+        if sum(priorities.values()) == 0:
+            print "We're done here, let's run for the stairs"
+            direction = self.warrior.direction_of_stairs()
+        else:
+            print 'Ram is thinking about where to go!'
+            print priorities
+            direction = max(priorities.iteritems(),
+                            key=operator.itemgetter(1))[0]
         return direction
+
+    def free_bomb_captive(self):
+        for direction, place in self.surroundings.iteritems():
+            if place.is_ticking():
+                self.warrior.rescue_(direction)
+                return
 
     def bind_adjacent_enemy(self):
         for direction, place in self.surroundings.iteritems():
@@ -94,11 +132,30 @@ class Player(object):
                 return
 
     def check_safe_to_rest(self):
+        '''
+        Checks a bunch of conditions to see if it is safe to rest.
+        '''
         safe = True
+        if self.check_bomb_ticking():
+            safe = False
         for place in self.surroundings.itervalues():
             if place.is_enemy():
                 safe = False
         return safe
+
+    def check_ticking_near(self):
+        NoOfTicking = 0
+        for place in self.surroundings.itervalues():
+            if place.is_ticking():
+                NoOfTicking += 1
+        return NoOfTicking
+
+    def check_bomb_ticking(self):
+        for sound in self.sounds:
+            if sound.is_ticking():
+                return True
+        return False
+
 
     def check_No_Enemies_near(self):
         NoOfEnemies = 0
