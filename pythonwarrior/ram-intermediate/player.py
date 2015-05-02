@@ -1,5 +1,6 @@
 import operator  # used for getting the max key of a dictionary
 
+
 class Player(object):
     def play_turn(self, warrior):
         '''
@@ -21,7 +22,8 @@ class Player(object):
         self.warrior = warrior
         self.surroundings = self.sense_surroundings()
         self.sounds = warrior.listen()
-        direction = self.determine_direction_of_next_objective()
+        self.direction_of_objective = \
+            self.determine_direction_of_next_objective()
 
         if self.check_rest_needed() & self.check_safe_to_rest():
             warrior.rest_()
@@ -30,16 +32,16 @@ class Player(object):
             self.free_bomb_captive()
             return
 
-        elif self.check_bomb_ticking():
-            if warrior.feel(direction).is_empty():
-                warrior.walk_(direction)
-            elif warrior.feel(direction).is_enemy():
-                warrior.attack_(direction)
-            return
-
         elif self.check_threatened():
             print 'Ram is feeling threatened, starting to bind enemies'
             self.bind_adjacent_enemy()
+            return
+
+        elif self.check_bomb_ticking():
+            if warrior.feel(self.direction_of_objective).is_empty():
+                warrior.walk_(self.direction_of_objective)
+            elif warrior.feel(self.direction_of_objective).is_enemy():
+                warrior.attack_(self.direction_of_objective)
             return
 
         elif self.check_No_Enemies_near() >= 1:
@@ -50,10 +52,9 @@ class Player(object):
             self.free_captive()
             return
         else:
-
             if self.sounds != []:
-                direction = self.avoid_stairs(direction)
-            warrior.walk_(direction)
+                direction = self.avoid_stairs(self.direction_of_objective)
+            warrior.walk_(self.direction_of_objective)
             return
 
     def get_possible_directions(self):
@@ -114,10 +115,18 @@ class Player(object):
                 return
 
     def bind_adjacent_enemy(self):
+        '''
+        Binds the enemy in the chose direction last as the terrain becomes
+        unpassable otherwise.
+        '''
         for direction, place in self.surroundings.iteritems():
-            if place.is_enemy():
+            if direction == self.direction_of_objective:
+                pass
+            elif place.is_enemy():
                 self.warrior.bind_(direction)
                 return
+        self.warrior.bind_(self.direction_of_objective)
+        return
 
     def attack_adjacent_enemy(self):
         for direction, place in self.surroundings.iteritems():
@@ -182,7 +191,7 @@ class Player(object):
 
     def check_rest_needed(self):
         health = self.warrior.health()
-        if self.sounds is None:
+        if self.sounds == []:
             print 'Ram no need rest! all work is done. [%s HP]' % health
             return False
         if health < 19:

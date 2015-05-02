@@ -1,35 +1,39 @@
-Level 7
+Level 8
 
-Another ticking sound, but some sludge is blocking the way.
+You discover a satchel of bombs which will help when facing a mob of enemies.
 
-Tip: Quickly kill the sludge and rescue the captive before the bomb goes off. You can't simply go around them.
+Tip: Detonate a bomb when you see a couple enemies ahead of you (warrior.look()). Watch out for your health too.
 
- -----
-| sC >|
-|@ s C|
-| s   |
- -----
+ -------
+|@ Ss C>|
+ -------
 
 
   > = Stairs
 
   @ = Ram (20 HP)
 
-  s = Sludge (12 HP)
-
   C = Captive (1 HP)
+
+  S = ThickSludge (24 HP)
+
+  s = Sludge (12 HP)
 
 
 
 Warrior Abilities:
 
 
+  warrior.listen
+    Returns an array of all spaces which have units in them.
+
+
   warrior.attack_
     Attacks a unit in given direction (forward by default).
 
 
-  warrior.direction_of_stairs
-    Returns the direction ('left', 'right', 'forward','backward') the stairs are from your location
+  warrior.look
+    ('Returns an array of up to three Spaces in the given direction', '(forward by default)')
 
 
   warrior.feel
@@ -60,8 +64,12 @@ Warrior Abilities:
     Binds a unit in given direction to keep him from moving (forward by default).
 
 
-  warrior.listen
-    Returns an array of all spaces which have units in them.
+  warrior.detonate_
+    Detonate a bomb in a given direction (forward by default) which damages that space and surrounding 4 spaces (including yourself).
+
+
+  warrior.direction_of_stairs
+    Returns the direction ('left', 'right', 'forward','backward') the stairs are from your location
 
 
 
